@@ -907,23 +907,6 @@ class Canvas(
                         self.line[0] = self.current[-1]
                         if int(ev.modifiers()) == QtCore.Qt.ControlModifier:
                             self.finalise()
-                    # [Feature] support for automatically switching to editing mode
-                    # when the cursor moves over an object
-                    if (
-                        self.create_mode
-                        in [
-                            "rectangle",
-                            "rotation",
-                            "quadrilateral",
-                            "circle",
-                            "line",
-                            "point",
-                        ]
-                        and not self.is_auto_labeling
-                        and not self.current
-                    ):
-                        self.prev_pan_point = ev.localPos()
-                        self.mode_changed.emit()
                 elif not self.out_off_pixmap(pos):
                     # Handle auto decode mode first click
                     if self.auto_decode_mode and self.is_auto_labeling:
