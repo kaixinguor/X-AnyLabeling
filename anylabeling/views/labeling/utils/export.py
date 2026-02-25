@@ -109,16 +109,27 @@ def export_yolo_annotation(self, mode):
         converter = LabelConverter(pose_cfg_file=self.yaml_file)
 
     elif mode in ["hbb", "obb", "seg"]:
-        filter = "Classes Files (*.txt);;All Files (*)"
-        self.classes_file, _ = QtWidgets.QFileDialog.getOpenFileName(
-            self,
-            self.tr("Select a specific classes file"),
-            "",
-            filter,
-        )
-        if not self.classes_file:
+        # Auto-extract classes from annotation files
+        label_file_list = self.get_label_file_list()
+        classes = []
+        for label_file in label_file_list:
+            if osp.exists(label_file):
+                with open(label_file, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                for shape in data.get("shapes", []):
+                    label = shape.get("label", "")
+                    if label and label not in classes:
+                        classes.append(label)
+        if not classes:
+            popup = Popup(
+                self.tr("No annotation classes found. Please annotate first!"),
+                self,
+                icon=new_icon_path("warning", "svg"),
+            )
+            popup.show_popup(self, position="center")
             return
-        converter = LabelConverter(classes_file=self.classes_file)
+        converter = LabelConverter()
+        converter.classes = classes
 
     dialog = QtWidgets.QDialog(self)
     dialog.setWindowTitle(self.tr("Export options"))
@@ -147,7 +158,6 @@ def export_yolo_annotation(self, mode):
             self,
             self.tr("Select Export Directory"),
             path_edit.text(),
-            QtWidgets.QFileDialog.DontUseNativeDialog,
         )
         if path:
             path_edit.setText(path)
@@ -330,7 +340,6 @@ def export_voc_annotation(self, mode):
             self,
             self.tr("Select Export Directory"),
             path_edit.text(),
-            QtWidgets.QFileDialog.DontUseNativeDialog,
         )
         if path:
             path_edit.setText(path)
@@ -542,7 +551,6 @@ def export_coco_annotation(self, mode):
             self,
             self.tr("Select Export Directory"),
             path_edit.text(),
-            QtWidgets.QFileDialog.DontUseNativeDialog,
         )
         if path:
             path_edit.setText(path)
@@ -699,7 +707,6 @@ def export_dota_annotation(self):
             self,
             self.tr("Select Export Directory"),
             path_edit.text(),
-            QtWidgets.QFileDialog.DontUseNativeDialog,
         )
         if path:
             path_edit.setText(path)
@@ -878,7 +885,6 @@ def export_mask_annotation(self):
             self,
             self.tr("Select Export Directory"),
             path_edit.text(),
-            QtWidgets.QFileDialog.DontUseNativeDialog,
         )
         if path:
             path_edit.setText(path)
@@ -1050,7 +1056,6 @@ def export_mot_annotation(self, mode):
             self,
             self.tr("Select Export Directory"),
             path_edit.text(),
-            QtWidgets.QFileDialog.DontUseNativeDialog,
         )
         if path:
             path_edit.setText(path)
@@ -1205,7 +1210,6 @@ def export_pporc_annotation(self, mode):
             self,
             self.tr("Select Export Directory"),
             path_edit.text(),
-            QtWidgets.QFileDialog.DontUseNativeDialog,
         )
         if path:
             path_edit.setText(path)

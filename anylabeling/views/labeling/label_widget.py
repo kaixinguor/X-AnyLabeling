@@ -30,7 +30,6 @@ from PyQt5.QtWidgets import (
     QRadioButton,
     QScrollArea,
     QVBoxLayout,
-    QWhatsThis,
     QWidget,
     QLineEdit,
 )
@@ -2296,10 +2295,6 @@ class LabelingWidget(LabelDialog):
         self.zoom_widget.valueChanged.connect(self.paint_canvas)
 
         self.populate_mode_actions()
-
-        self.first_start = True
-        if self.first_start:
-            QWhatsThis.enterWhatsThisMode()
 
         self.set_text_editing(False)
 
